@@ -194,3 +194,17 @@ class PresetCreate(BaseModel):
     title: str = Field(..., min_length=2, max_length=50)
     work_minutes: int = Field(..., ge=1, le=180)
     break_minutes: int = Field(..., ge=1, le=60)
+
+
+class PresetUpdate(BaseModel):
+    title: Optional[str] = Field(None, min_length=2, max_length=50)
+    work_minutes: Optional[int] = Field(None, ge=1, le=180)
+    break_minutes: Optional[int] = Field(None, ge=1, le=60)
+
+
+class PresetResponse(BaseModel):
+    id: int
+    title: str
+    work_minutes: int
+    break_minutes: int
+    created_at: datetime
