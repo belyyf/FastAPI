@@ -42,3 +42,24 @@ def create_product(product: ProductCreate):
     }
     products_db[products_counter] = product_data
     return product_data
+
+
+@app.get("/products", response_model=list[ProductResponse])
+def get_products(
+    min_price: Optional[int] = None,
+    max_price: Optional[int] = None,
+    in_stock: Optional[bool] = None,
+):
+    if min_price is not None and max_price is not None and min_price > max_price:
+        raise HTTPException(status_code=400, detail="min_price должен быть <= max_price")
+
+    result = list(products_db.values())
+
+    if min_price is not None:
+        result = [p for p in result if p["price"] >= min_price]
+    if max_price is not None:
+        result = [p for p in result if p["price"] <= max_price]
+    if in_stock is not None:
+        result = [p for p in result if p["in_stock"] == in_stock]
+
+    return result
