@@ -28,3 +28,17 @@ class ProductResponse(BaseModel):
     name: str
     price: int
     in_stock: bool
+
+
+@app.post("/products", response_model=ProductResponse)
+def create_product(product: ProductCreate):
+    global products_counter
+    products_counter += 1
+    product_data = {
+        "id": products_counter,
+        "name": product.name,
+        "price": product.price,
+        "in_stock": product.in_stock,
+    }
+    products_db[products_counter] = product_data
+    return product_data
