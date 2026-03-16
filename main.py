@@ -137,3 +137,18 @@ def create_student(student: StudentCreate):
     }
     students_db[students_counter] = student_data
     return student_data
+
+
+@app.get("/students", response_model=list[StudentResponse])
+def get_students(
+    group_name: Optional[str] = None,
+    is_active: Optional[bool] = None,
+):
+    result = list(students_db.values())
+
+    if group_name is not None:
+        result = [s for s in result if s["group_name"] == group_name]
+    if is_active is not None:
+        result = [s for s in result if s["is_active"] == is_active]
+
+    return result
