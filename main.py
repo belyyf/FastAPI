@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException, Query
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from datetime import datetime
 from typing import Optional
 
@@ -104,3 +104,22 @@ class StudentCreate(BaseModel):
     full_name: str = Field(..., min_length=5, max_length=120)
     group_name: str = Field(..., min_length=1, max_length=20)
     is_active: bool = True
+
+    @field_validator("full_name")
+    @classmethod
+    def validate_full_name(cls, v):
+        if " " not in v:
+            raise ValueError("full_name должен содержать хотя бы пробел (имя и фамилия)")
+        return v
+
+
+class StudentUpdate(BaseModel):
+    group_name: Optional[str] = Field(None, min_length=1, max_length=20)
+    is_active: Optional[bool] = None
+
+
+class StudentResponse(BaseModel):
+    id: int
+    full_name: str
+    group_name: str
+    is_active: bool
