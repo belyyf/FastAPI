@@ -208,3 +208,67 @@ class PresetResponse(BaseModel):
     work_minutes: int
     break_minutes: int
     created_at: datetime
+
+
+@app.post("/presets", response_model=PresetResponse)
+def create_preset(preset: PresetCreate):
+    global presets_counter
+    if preset.work_minutes <= preset.break_minutes:
+        raise HTTPException(
+            status_code=400, detail="work_minutes должен быть > break_minutes"
+        )
+
+    presets_counter += 1
+    preset_data = {
+        "id": presets_counter,
+        "title": preset.title,
+        "work_minutes": preset.work_minutes,
+        "break_minutes": preset.break_minutes,
+        "created_at": datetime.now(),
+    }
+    presets_db[presets_counter] = preset_data
+    return preset_data
+
+
+@app.get("/presets", response_model=list[PresetResponse])
+def get_presets():
+    return list(presets_db.values())
+
+
+@app.get("/presets/{preset_id}", response_model=PresetResponse)
+def get_preset(preset_id: int):
+    if preset_id not in presets_db:
+        raise HTTPException(status_code=404, detail="Preset not found")
+    return presets_db[preset_id]
+
+
+@app.patch("/presets/{preset_id}", response_model=PresetResponse)
+def update_preset(preset_id: int, preset: PresetUpdate):
+    if preset_id not in presets_db:
+        raise HTTPException(status_code=404, detail="Preset not found")
+
+    preset_data = presets_db[preset_id]
+
+    if preset.title is not None:
+        preset_data["title"] = preset.title
+    if preset.work_minutes is not None:
+        preset_data["work_minutes"] = preset.work_minutes
+    if preset.break_minutes is not None:
+        preset_data["break_minutes"] = preset.break_minutes
+
+    # Проверка: work_minutes > break_minutes
+    if preset_data["work_minutes"] <= preset_data["break_minutes"]:
+        raise HTTPException(
+            status_code=400, detail="work_minutes должен быть > break_minutes"
+        )
+
+    presets_db[preset_id] = preset_data
+    return preset_data
+
+
+@app.delete("/presets/{preset_id}")
+def delete_preset(preset_id: int):
+    if preset_id not in presets_db:
+        raise HTTPException(status_code=404, detail="Preset not found")
+    del presets_db[preset_id]
+    return {"message": "Preset deleted"}
