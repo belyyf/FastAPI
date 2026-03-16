@@ -85,3 +85,11 @@ def update_product(product_id: int, product: ProductUpdate):
     }
     products_db[product_id] = product_data
     return product_data
+
+
+@app.delete("/products/{product_id}")
+def delete_product(product_id: int):
+    if product_id not in products_db:
+        raise HTTPException(status_code=404, detail="Product not found")
+    del products_db[product_id]
+    return {"message": "Product deleted"}
