@@ -93,3 +93,14 @@ def delete_product(product_id: int):
         raise HTTPException(status_code=404, detail="Product not found")
     del products_db[product_id]
     return {"message": "Product deleted"}
+
+
+# ========== Задача 3: Students ==========
+students_db: dict[int, dict] = {}
+students_counter = 0
+
+
+class StudentCreate(BaseModel):
+    full_name: str = Field(..., min_length=5, max_length=120)
+    group_name: str = Field(..., min_length=1, max_length=20)
+    is_active: bool = True
