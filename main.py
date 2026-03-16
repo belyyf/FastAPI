@@ -152,3 +152,34 @@ def get_students(
         result = [s for s in result if s["is_active"] == is_active]
 
     return result
+
+
+@app.get("/students/{student_id}", response_model=StudentResponse)
+def get_student(student_id: int):
+    if student_id not in students_db:
+        raise HTTPException(status_code=404, detail="Student not found")
+    return students_db[student_id]
+
+
+@app.patch("/students/{student_id}", response_model=StudentResponse)
+def update_student(student_id: int, student: StudentUpdate):
+    if student_id not in students_db:
+        raise HTTPException(status_code=404, detail="Student not found")
+
+    student_data = students_db[student_id]
+
+    if student.group_name is not None:
+        student_data["group_name"] = student.group_name
+    if student.is_active is not None:
+        student_data["is_active"] = student.is_active
+
+    students_db[student_id] = student_data
+    return student_data
+
+
+@app.delete("/students/{student_id}")
+def delete_student(student_id: int):
+    if student_id not in students_db:
+        raise HTTPException(status_code=404, detail="Student not found")
+    del students_db[student_id]
+    return {"message": "Student deleted"}
