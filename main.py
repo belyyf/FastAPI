@@ -183,3 +183,14 @@ def delete_student(student_id: int):
         raise HTTPException(status_code=404, detail="Student not found")
     del students_db[student_id]
     return {"message": "Student deleted"}
+
+
+# ========== Задача 4: Pomodoro Presets ==========
+presets_db: dict[int, dict] = {}
+presets_counter = 0
+
+
+class PresetCreate(BaseModel):
+    title: str = Field(..., min_length=2, max_length=50)
+    work_minutes: int = Field(..., ge=1, le=180)
+    break_minutes: int = Field(..., ge=1, le=60)
