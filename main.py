@@ -63,3 +63,10 @@ def get_products(
         result = [p for p in result if p["in_stock"] == in_stock]
 
     return result
+
+
+@app.get("/products/{product_id}", response_model=ProductResponse)
+def get_product(product_id: int):
+    if product_id not in products_db:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return products_db[product_id]
