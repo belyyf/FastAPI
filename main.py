@@ -123,3 +123,17 @@ class StudentResponse(BaseModel):
     full_name: str
     group_name: str
     is_active: bool
+
+
+@app.post("/students", response_model=StudentResponse)
+def create_student(student: StudentCreate):
+    global students_counter
+    students_counter += 1
+    student_data = {
+        "id": students_counter,
+        "full_name": student.full_name,
+        "group_name": student.group_name,
+        "is_active": student.is_active,
+    }
+    students_db[students_counter] = student_data
+    return student_data
