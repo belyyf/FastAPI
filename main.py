@@ -70,3 +70,18 @@ def get_product(product_id: int):
     if product_id not in products_db:
         raise HTTPException(status_code=404, detail="Product not found")
     return products_db[product_id]
+
+
+@app.put("/products/{product_id}", response_model=ProductResponse)
+def update_product(product_id: int, product: ProductUpdate):
+    if product_id not in products_db:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    product_data = {
+        "id": product_id,
+        "name": product.name,
+        "price": product.price,
+        "in_stock": product.in_stock,
+    }
+    products_db[product_id] = product_data
+    return product_data
